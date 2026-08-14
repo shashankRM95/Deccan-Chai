@@ -1,0 +1,43 @@
+import type { Outlet } from './types';
+
+export const outlets: Outlet[] = [
+  { id: 'o-gownipalli', name: 'Gownipalli (Srinivaspur)', city: 'Kolar', area: 'Gownipalli', address: 'Main Road, Gownipalli, Srinivaspur, Kolar 563161', hours: '6:00 AM – 11:30 PM', phone: '+91 94499 74481', lat: 13.3853, lng: 78.2612, amenities: ['Dine-in', 'Takeaway', 'WiFi', 'Parking'], dineIn: true, takeaway: true },
+  { id: 'o1', name: 'Banjara Hills', city: 'Hyderabad', area: 'Banjara Hills', address: 'Road No. 12, Banjara Hills, Hyderabad', hours: '6:00 AM – 11:30 PM', phone: '+91 90000 10001', lat: 17.4156, lng: 78.4347, amenities: ['Dine-in', 'Takeaway', 'WiFi', 'Parking'], dineIn: true, takeaway: true },
+  { id: 'o2', name: 'Charminar', city: 'Hyderabad', area: 'Old City', address: 'Near Charminar, Old City, Hyderabad', hours: '5:30 AM – 12:00 AM', phone: '+91 90000 10002', lat: 17.3616, lng: 78.4747, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'o3', name: 'Gachibowli', city: 'Hyderabad', area: 'Gachibowli', address: 'IT Corridor, Gachibowli, Hyderabad', hours: '6:00 AM – 11:00 PM', phone: '+91 90000 10003', lat: 17.4401, lng: 78.3489, amenities: ['Dine-in', 'Takeaway', 'WiFi', 'Drive-thru'], dineIn: true, takeaway: true },
+  { id: 'o4', name: 'Hitech City', city: 'Hyderabad', area: 'Madhapur', address: 'Hitech City Rd, Madhapur, Hyderabad', hours: '6:00 AM – 11:30 PM', phone: '+91 90000 10004', lat: 17.4435, lng: 78.3772, amenities: ['Dine-in', 'Takeaway', 'WiFi'], dineIn: true, takeaway: true },
+  { id: 'o5', name: 'Jubilee Hills', city: 'Hyderabad', area: 'Jubilee Hills', address: 'Jubilee Hills Rd No. 36, Hyderabad', hours: '6:30 AM – 11:30 PM', phone: '+91 90000 10005', lat: 17.4325, lng: 78.4071, amenities: ['Dine-in', 'Takeaway', 'Parking'], dineIn: true, takeaway: true },
+  { id: 'o6', name: 'Secunderabad', city: 'Hyderabad', area: 'Secunderabad', address: 'Sarojini Devi Rd, Secunderabad', hours: '6:00 AM – 11:00 PM', phone: '+91 90000 10006', lat: 17.4399, lng: 78.4983, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'o7', name: 'Begumpet', city: 'Hyderabad', area: 'Begumpet', address: 'Prakash Nagar, Begumpet, Hyderabad', hours: '6:00 AM – 11:00 PM', phone: '+91 90000 10007', lat: 17.4434, lng: 78.4596, amenities: ['Dine-in', 'Takeaway', 'Parking'], dineIn: true, takeaway: true },
+  { id: 'o8', name: 'Kondapur', city: 'Hyderabad', area: 'Kondapur', address: 'Kondapur Main Rd, Hyderabad', hours: '6:30 AM – 11:00 PM', phone: '+91 90000 10008', lat: 17.4615, lng: 78.3656, amenities: ['Dine-in', 'Takeaway', 'WiFi'], dineIn: true, takeaway: true },
+  { id: 'o9', name: 'Kothapet', city: 'Hyderabad', area: 'Kothapet', address: 'Kothapet X Roads, Hyderabad', hours: '6:00 AM – 10:30 PM', phone: '+91 90000 10009', lat: 17.3712, lng: 78.5463, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'o10', name: 'Dilsukhnagar', city: 'Hyderabad', area: 'Dilsukhnagar', address: 'Dilsukhnagar Main Rd, Hyderabad', hours: '6:00 AM – 11:00 PM', phone: '+91 90000 10010', lat: 17.3689, lng: 78.5275, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+
+  { id: 'o11', name: 'Banashankari', city: 'Bengaluru', area: 'Banashankari', address: 'Banashankari Stage II, Bengaluru', hours: '6:30 AM – 11:00 PM', phone: '+91 90000 20001', lat: 12.9253, lng: 77.5468, amenities: ['Dine-in', 'Takeaway', 'WiFi'], dineIn: true, takeaway: true },
+  { id: 'o12', name: 'Indiranagar', city: 'Bengaluru', area: 'Indiranagar', address: '100 Ft Rd, Indiranagar, Bengaluru', hours: '6:30 AM – 11:30 PM', phone: '+91 90000 20002', lat: 12.9719, lng: 77.6412, amenities: ['Dine-in', 'Takeaway', 'WiFi', 'Parking'], dineIn: true, takeaway: true },
+  { id: 'o13', name: 'Koramangala', city: 'Bengaluru', area: 'Koramangala', address: '5th Block, Koramangala, Bengaluru', hours: '6:30 AM – 11:30 PM', phone: '+91 90000 20003', lat: 12.9352, lng: 77.6245, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'o14', name: 'Whitefield', city: 'Bengaluru', area: 'Whitefield', address: 'ITPL Main Rd, Whitefield, Bengaluru', hours: '6:30 AM – 11:00 PM', phone: '+91 90000 20004', lat: 12.9698, lng: 77.7499, amenities: ['Dine-in', 'Takeaway', 'WiFi'], dineIn: true, takeaway: true },
+  { id: 'o15', name: 'HSR Layout', city: 'Bengaluru', area: 'HSR Layout', address: 'HSR Sector 2, Bengaluru', hours: '6:30 AM – 11:00 PM', phone: '+91 90000 20005', lat: 12.9116, lng: 77.6473, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+
+  { id: 'o16', name: 'Banjara Hills', city: 'Chennai', area: 'T. Nagar', address: 'Thyagaraja Nagar, Chennai', hours: '6:00 AM – 11:00 PM', phone: '+91 90000 30001', lat: 13.0418, lng: 80.2341, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'o17', name: 'Anna Nagar', city: 'Chennai', area: 'Anna Nagar', address: 'Anna Nagar West, Chennai', hours: '6:00 AM – 11:00 PM', phone: '+91 90000 30002', lat: 13.0850, lng: 80.2101, amenities: ['Dine-in', 'Takeaway', 'Parking'], dineIn: true, takeaway: true },
+  { id: 'o18', name: 'Velachery', city: 'Chennai', area: 'Velachery', address: 'Velachery Main Rd, Chennai', hours: '6:30 AM – 10:30 PM', phone: '+91 90000 30003', lat: 12.9792, lng: 80.2200, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+
+  { id: 'o19', name: 'Banjara Hills', city: 'Mumbai', area: 'Andheri West', address: 'Linking Road, Andheri West, Mumbai', hours: '6:30 AM – 11:30 PM', phone: '+91 90000 40001', lat: 19.1136, lng: 72.8295, amenities: ['Dine-in', 'Takeaway', 'WiFi'], dineIn: true, takeaway: true },
+  { id: 'o20', name: 'Bandra', city: 'Mumbai', area: 'Bandra West', address: 'Hill Road, Bandra West, Mumbai', hours: '6:30 AM – 12:00 AM', phone: '+91 90000 40002', lat: 19.0596, lng: 72.8295, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'o21', name: 'Powai', city: 'Mumbai', area: 'Powai', address: 'Hiranandani Gardens, Powai, Mumbai', hours: '6:30 AM – 11:00 PM', phone: '+91 90000 40003', lat: 19.1176, lng: 72.9060, amenities: ['Dine-in', 'Takeaway', 'WiFi', 'Parking'], dineIn: true, takeaway: true },
+
+  { id: 'o22', name: 'Connaught Place', city: 'Delhi', area: 'CP', address: 'Inner Circle, Connaught Place, New Delhi', hours: '7:00 AM – 11:30 PM', phone: '+91 90000 50001', lat: 28.6315, lng: 77.2167, amenities: ['Dine-in', 'Takeaway', 'WiFi'], dineIn: true, takeaway: true },
+  { id: 'o23', name: 'Cyber Hub', city: 'Delhi', area: 'Gurugram', address: 'Cyber Hub, Gurugram, NCR', hours: '6:30 AM – 11:30 PM', phone: '+91 90000 50002', lat: 28.4949, lng: 77.0890, amenities: ['Dine-in', 'Takeaway', 'WiFi', 'Parking'], dineIn: true, takeaway: true },
+  { id: 'o24', name: 'Lajpat Nagar', city: 'Delhi', area: 'Lajpat Nagar', address: 'Central Market, Lajpat Nagar, Delhi', hours: '6:30 AM – 11:00 PM', phone: '+91 90000 50003', lat: 28.5677, lng: 77.2425, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+
+  { id: 'o25', name: 'Banjara Hills', city: 'Pune', area: 'Koregaon Park', address: 'Lane 5, Koregaon Park, Pune', hours: '6:30 AM – 11:00 PM', phone: '+91 90000 60001', lat: 18.5362, lng: 73.8939, amenities: ['Dine-in', 'Takeaway', 'WiFi'], dineIn: true, takeaway: true },
+  { id: 'o26', name: 'Banjara Hills', city: 'Pune', area: 'Baner', address: 'Baner Rd, Pune', hours: '6:30 AM – 11:00 PM', phone: '+91 90000 60002', lat: 18.5589, lng: 73.7755, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+
+  { id: 'o27', name: 'Banjara Hills', city: 'Vizag', area: 'RK Beach', address: 'Beach Rd, Ramakrishna Beach, Visakhapatnam', hours: '6:00 AM – 11:00 PM', phone: '+91 90000 70001', lat: 17.7204, lng: 83.3147, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'o28', name: 'Banjara Hills', city: 'Warangal', area: 'Kazipet', address: 'Kazipet X Roads, Warangal', hours: '6:00 AM – 10:30 PM', phone: '+91 90000 80001', lat: 17.9773, lng: 79.5288, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'o29', name: 'Banjara Hills', city: 'Vijayawada', area: 'MG Road', address: 'MG Road, Vijayawada', hours: '6:00 AM – 11:00 PM', phone: '+91 90000 90001', lat: 16.5062, lng: 80.6480, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'o30', name: 'Banjara Hills', city: 'Bhubaneswar', area: 'Patia', address: 'Patia, Bhubaneswar', hours: '6:30 AM – 11:00 PM', phone: '+91 90000 11001', lat: 20.2960, lng: 85.8245, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+];
+
+export const cities = Array.from(new Set(outlets.map((o) => o.city)));
