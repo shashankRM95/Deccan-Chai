@@ -377,23 +377,23 @@ function OrderPageInner({
                       <p className="text-[11px] sm:text-xs text-navy-600 dark:text-cream-200/70 leading-relaxed mb-2 sm:mb-3 flex-1 line-clamp-2">{item.description}</p>
                       
                       {isCustomerLoggedIn ? (
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => setSheetItem(item)}
-                            className="flex-1 text-xs py-2 rounded-full border border-maroon-700/20 text-maroon-800 dark:text-gold-300 hover:bg-maroon-50 dark:hover:bg-navy-800 transition-colors font-semibold"
-                          >
-                            Customize
-                          </button>
+                        <div className="flex flex-col gap-1.5 sm:flex-row sm:gap-2">
                           <button
                             onClick={() => handleQuickAdd(item)}
-                            className="btn-primary text-xs py-2 px-3 font-semibold flex items-center justify-center gap-1"
+                            className="w-full btn-primary text-xs py-2 font-semibold flex items-center justify-center gap-1"
                           >
                             <Plus className="w-3.5 h-3.5" /> Add
+                          </button>
+                          <button
+                            onClick={() => setSheetItem(item)}
+                            className="w-full text-[10px] sm:text-xs py-1.5 rounded-full border border-maroon-700/20 text-maroon-800 dark:text-gold-300 hover:bg-maroon-50 dark:hover:bg-navy-800 transition-colors font-semibold text-center"
+                          >
+                            Customize
                           </button>
                         </div>
                       ) : isOwner ? (
                         <div className="text-xs text-navy-400 dark:text-cream-200/40 text-center py-2 bg-cream-100 dark:bg-navy-800 rounded-full font-medium">
-                          Store Owner View
+                          Owner View
                         </div>
                       ) : (
                         <button

@@ -475,10 +475,20 @@ function InventoryTab() {
       status,
     };
 
-    await supabase.from('inventory').insert([itemObj]);
+    // Optimistic update
+    const tempId = `temp-${Date.now()}`;
+    setItems(prev => [...prev, { id: tempId, ...itemObj }]);
     setIsModalOpen(false);
     setNewItem({ item_name: '', current_stock: '', min_stock: '', unit: 'kg' });
-    fetchInventory();
+
+    const { data, error } = await supabase.from('inventory').insert([itemObj]).select().single();
+    if (data) {
+      // Replace temp with real
+      setItems(prev => prev.map(i => i.id === tempId ? data : i));
+    } else if (error) {
+      console.warn('Inventory insert error (table may not exist):', error.message);
+      // Keep optimistic item with temp id — visible in session
+    }
   };
 
   return (
@@ -582,8 +592,10 @@ function StaffTab() {
   useEffect(() => { fetchStaff(); }, [fetchStaff]);
 
   const togglePresent = async (id: string, present: boolean) => {
-    await supabase.from('staff').update({ present: !present }).eq('id', id);
     setStaff(prev => prev.map(s => s.id === id ? { ...s, present: !present } : s));
+    if (!id.startsWith('temp-')) {
+      await supabase.from('staff').update({ present: !present }).eq('id', id);
+    }
   };
 
   const handleAddStaff = async (e: React.FormEvent) => {
@@ -596,10 +608,20 @@ function StaffTab() {
       shift: newStaff.shift,
       present: true,
     };
-    await supabase.from('staff').insert([staffObj]);
+
+    // Optimistic update
+    const tempId = `temp-${Date.now()}`;
+    setStaff(prev => [...prev, { id: tempId, ...staffObj }]);
     setIsModalOpen(false);
     setNewStaff({ name: '', phone: '', role: 'Tea Maker', shift: 'Morning' });
-    fetchStaff();
+
+    const { data, error } = await supabase.from('staff').insert([staffObj]).select().single();
+    if (data) {
+      setStaff(prev => prev.map(s => s.id === tempId ? data : s));
+    } else if (error) {
+      console.warn('Staff insert error (table may not exist):', error.message);
+      // Keep optimistic entry visible in session
+    }
   };
 
   const presentCount = staff.filter(s => s.present).length;
@@ -820,9 +842,11 @@ function StoreSettingsTab() {
   const saveTableCount = async (count: number) => {
     setTableSaving(true);
     localStorage.setItem('deccan_store_tables', count.toString());
+    // Get first outlet id
     const { data } = await supabase.from('outlets').select('id').limit(1).maybeSingle();
     if (data?.id) {
-      await supabase.from('outlets').update({ dine_in: true }).eq('id', data.id);
+      // Save actual table_count so OrderPage picks it up
+      await supabase.from('outlets').update({ table_count: count }).eq('id', data.id);
     }
     window.dispatchEvent(new CustomEvent('deccan_store_settings_updated', { detail: { table_count: count } }));
     setTableSaving(false);

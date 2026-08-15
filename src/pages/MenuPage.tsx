@@ -316,20 +316,20 @@ export function MenuPage() {
                               Store Owner View
                             </div>
                           ) : (
-                            <div className="flex items-center gap-1.5 sm:gap-2">
-                              <button
-                                onClick={() => setSheetItem(item)}
-                                className="flex-1 btn-outline text-[10px] sm:text-xs py-2 sm:py-2.5"
-                              >
-                                <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-orange-500" />
-                                Customize
-                              </button>
+                            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
                               <button
                                 onClick={() => handleQuickAdd(item)}
-                                className="btn-primary text-[10px] sm:text-xs py-2 sm:py-2.5 px-2.5 sm:px-4"
+                                className="w-full btn-primary text-[10px] sm:text-xs py-2 sm:py-2.5 flex items-center justify-center gap-1"
                               >
                                 <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                 Add
+                              </button>
+                              <button
+                                onClick={() => setSheetItem(item)}
+                                className="w-full text-[10px] sm:text-xs py-1.5 sm:py-2 rounded-full border border-maroon-700/20 text-maroon-800 dark:text-gold-300 hover:bg-maroon-50 dark:hover:bg-navy-800 transition-colors font-semibold text-center"
+                              >
+                                <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-orange-500 inline mr-0.5" />
+                                Customize
                               </button>
                             </div>
                           )}
