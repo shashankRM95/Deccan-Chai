@@ -149,6 +149,7 @@ function OrderPageInner({
       <div className="container-px mx-auto max-w-7xl pt-4 pb-6 space-y-6">
 
         {/* ===== HORIZONTAL TABLE SELECTION BAR ABOVE MENU ===== */}
+        {!isOwner && (
         <div className="card p-4 sm:p-5 bg-white dark:bg-navy-900 shadow-sm border border-cream-300/40 dark:border-cream-100/10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-2">
@@ -191,6 +192,7 @@ function OrderPageInner({
             ))}
           </div>
         </div>
+        )}
 
         {/* ===== HORIZONTAL YOUR ORDER CART PANEL (DIRECTLY BELOW TABLE SECTION) ===== */}
         {/* Placed Order Items Bar */}
@@ -350,7 +352,7 @@ function OrderPageInner({
               <p>No items in this category</p>
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
               {filtered.map((item: MenuItem) => {
                 const cartQty = lines.filter((l: any) => l.item.id === item.id).reduce((s: number, l: any) => s + l.quantity, 0);
                 return (
@@ -367,12 +369,12 @@ function OrderPageInner({
                         <Clock className="w-2.5 h-2.5" /> {item.prepTime}m
                       </div>
                     </div>
-                    <div className="p-3.5 flex flex-col flex-1">
+                    <div className="p-3 sm:p-3.5 flex flex-col flex-1">
                       <div className="flex items-start justify-between gap-1 mb-1">
-                        <h3 className="font-sans font-bold text-sm text-navy-900 dark:text-cream-50 leading-tight">{item.name}</h3>
-                        <span className="font-sans font-bold text-sm text-maroon-700 dark:text-gold-300 whitespace-nowrap">₹{item.price}</span>
+                        <h3 className="font-sans font-bold text-xs sm:text-sm text-navy-900 dark:text-cream-50 leading-tight">{item.name}</h3>
+                        <span className="font-sans font-bold text-xs sm:text-sm text-maroon-700 dark:text-gold-300 whitespace-nowrap">₹{item.price}</span>
                       </div>
-                      <p className="text-xs text-navy-600 dark:text-cream-200/70 leading-relaxed mb-3 flex-1 line-clamp-2">{item.description}</p>
+                      <p className="text-[11px] sm:text-xs text-navy-600 dark:text-cream-200/70 leading-relaxed mb-2 sm:mb-3 flex-1 line-clamp-2">{item.description}</p>
                       
                       {isCustomerLoggedIn ? (
                         <div className="flex gap-2">

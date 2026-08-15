@@ -259,7 +259,7 @@ export function MenuPage() {
                     {catItems.length} items
                   </span>
                 </div>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
                   {catItems.map((item) => {
                     const isFav = favorites.includes(item.id);
                     return (
@@ -298,16 +298,16 @@ export function MenuPage() {
                             <Clock className="w-3 h-3" /> {item.prepTime}m
                           </div>
                         </div>
-                        <div className="p-5 flex flex-col flex-1">
-                          <div className="flex items-start justify-between gap-2 mb-1.5">
-                            <h3 className="font-sans font-bold text-navy-900 dark:text-cream-50">
+                        <div className="p-3 sm:p-5 flex flex-col flex-1">
+                          <div className="flex items-start justify-between gap-1 sm:gap-2 mb-1.5">
+                            <h3 className="font-sans font-bold text-xs sm:text-sm text-navy-900 dark:text-cream-50 leading-tight">
                               {item.name}
                             </h3>
-                            <span className="font-sans font-bold text-maroon-700 dark:text-gold-300 whitespace-nowrap">
+                            <span className="font-sans font-bold text-xs sm:text-sm text-maroon-700 dark:text-gold-300 whitespace-nowrap">
                               ₹{item.price}
                             </span>
                           </div>
-                          <p className="text-sm text-navy-600 dark:text-cream-200/70 leading-relaxed mb-4 flex-1">
+                          <p className="text-[11px] sm:text-sm text-navy-600 dark:text-cream-200/70 leading-relaxed mb-3 flex-1 line-clamp-2">
                             {item.description}
                           </p>
 
@@ -316,19 +316,19 @@ export function MenuPage() {
                               Store Owner View
                             </div>
                           ) : (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 sm:gap-2">
                               <button
                                 onClick={() => setSheetItem(item)}
-                                className="flex-1 btn-outline text-xs py-2.5"
+                                className="flex-1 btn-outline text-[10px] sm:text-xs py-2 sm:py-2.5"
                               >
-                                <Flame className="w-3.5 h-3.5 text-orange-500" />
+                                <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-orange-500" />
                                 Customize
                               </button>
                               <button
                                 onClick={() => handleQuickAdd(item)}
-                                className="btn-primary text-xs py-2.5 px-4"
+                                className="btn-primary text-[10px] sm:text-xs py-2 sm:py-2.5 px-2.5 sm:px-4"
                               >
-                                <Plus className="w-3.5 h-3.5" />
+                                <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                 Add
                               </button>
                             </div>

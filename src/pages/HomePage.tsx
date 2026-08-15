@@ -52,8 +52,24 @@ export function HomePage() {
         {/* Charminar silhouette */}
         <Charminar className="absolute bottom-0 right-0 w-[500px] h-[400px] text-cream-100/[0.06] pointer-events-none hidden md:block" />
 
-        <div className="relative container-px mx-auto max-w-7xl pt-24 pb-16 grid lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-7 space-y-8">
+        <div className="relative container-px mx-auto max-w-7xl pt-24 pb-16 grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Hero image — mobile only, shown above text */}
+          <div className="flex lg:hidden justify-center">
+            <div className="relative w-44 h-44 sm:w-56 sm:h-56">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gold-400/20 to-maroon-500/10 blur-2xl" />
+              <div className="relative w-full h-full rounded-full overflow-hidden ring-1 ring-cream-100/10 shadow-2xl shadow-maroon-950/50">
+                <img
+                  src={getAssetUrl('images/hero/Deccan_Chai_Logo_1.png')}
+                  alt="Deccan Chai"
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-maroon-950/40 via-transparent to-transparent" />
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-7 space-y-6 lg:space-y-8">
             <div className={`inline-flex items-center gap-2 rounded-full bg-gold-400/10 border border-gold-400/20 px-4 py-1.5 ${mounted ? 'animate-fade-in' : 'opacity-0'}`}>
               <span className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
@@ -102,7 +118,7 @@ export function HomePage() {
             </div>
           </div>
 
-          {/* Hero cup visual */}
+          {/* Hero cup visual — desktop only */}
           <div className="lg:col-span-5 relative hidden lg:flex justify-center">
             <div className="relative w-80 h-80">
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gold-400/20 to-maroon-500/10 blur-2xl" />
@@ -222,7 +238,7 @@ export function HomePage() {
             </button>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {featured.map((item: MenuItem, i: number) => (
               <div
                 key={item.id}
