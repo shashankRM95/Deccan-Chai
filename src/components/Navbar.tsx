@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Coffee, Menu as MenuIcon, X, Sun, Moon, MapPin, ShoppingBag, User, LayoutDashboard } from 'lucide-react';
+import { Menu as MenuIcon, X, Sun, Moon, MapPin, ShoppingBag, User, LayoutDashboard } from 'lucide-react';
 import { useRouter, type Route } from '@/router';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { getAssetUrl } from '@/getImageUrl';
 
 const navItems: { label: string; route: Route }[] = [
   { label: 'Home', route: 'home' },
@@ -51,7 +52,7 @@ export function Navbar({ darkMode, toggleDark }: { darkMode: boolean; toggleDark
       }`}>
         <button onClick={() => go('home')} className="flex items-center gap-2.5 group">
           <span className="grid place-items-center w-10 h-10 rounded-full bg-cream-50 shadow-lg shadow-maroon-900/30 group-hover:scale-105 transition-transform overflow-hidden">
-            <img src="/images/brand/brand.png" alt="Logo" className="w-full h-full object-cover" />
+            <img src={getAssetUrl('images/brand/brand.png')} alt="Logo" className="w-full h-full object-cover" />
           </span>
           <span className="flex flex-col leading-none">
             <span className={`font-sans font-extrabold text-lg tracking-tight ${solid ? 'text-maroon-800 dark:text-cream-50' : 'text-cream-50'}`}>

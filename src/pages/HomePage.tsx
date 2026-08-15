@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ArrowRight, MapPin, Coffee, Star, Quote, ChevronLeft, ChevronRight, Clock, Award, Leaf, Heart } from 'lucide-react';
 import { useRouter } from '@/router';
 import { supabase } from '@/lib/supabase';
-import { getImageUrl } from '@/getImageUrl';
+import { getImageUrl, getAssetUrl } from '@/getImageUrl';
 import type { MenuItem } from '@/data/types';
 import { testimonials } from '@/data/testimonials';
 import { Charminar, Lantern } from '@/components/Charminar';
@@ -90,7 +90,7 @@ export function HomePage() {
 
             <div className={`flex items-center gap-8 pt-4 ${mounted ? 'animate-fade-up [animation-delay:0.45s]' : 'opacity-0'}`}>
               {[
-                { n: '250+', l: 'Outlets' },
+                { n: '400+', l: 'Outlets' },
                 { n: '1 Cr+', l: 'Customers' },
                 { n: '3 Cr+', l: 'Cups Sold' },
               ].map((s) => (
@@ -108,7 +108,7 @@ export function HomePage() {
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gold-400/20 to-maroon-500/10 blur-2xl" />
               <div className="relative w-full h-full rounded-full overflow-hidden ring-1 ring-cream-100/10 shadow-2xl shadow-maroon-950/50">
                 <img
-                  src="/images/hero/Deccan_Chai_Logo_1.png"
+                  src={getAssetUrl('images/hero/Deccan_Chai_Logo_1.png')}
                   alt="Deccan Chai"
                   className="w-full h-full object-cover"
                   loading="eager"
@@ -149,18 +149,18 @@ export function HomePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <div className="relative h-64 lg:h-80 rounded-3xl overflow-hidden glass hover:shadow-xl transition-all duration-500">
-                    <img src="/images/menu/kadak-tea.jpg" alt="Brewing chai" className="w-full h-full object-cover" loading="lazy" />
+                    <img src={getAssetUrl('images/menu/kadak-tea.jpg')} alt="Brewing chai" className="w-full h-full object-cover" loading="lazy" />
                   </div>
                   <div className="relative h-48 lg:h-64 rounded-3xl overflow-hidden glass hover:shadow-xl transition-all duration-500">
-                    <img src="/images/menu/spices.jpg" alt="Spices" className="w-full h-full object-cover" loading="lazy" />
+                    <img src={getAssetUrl('images/menu/spices.jpg')} alt="Spices" className="w-full h-full object-cover" loading="lazy" />
                   </div>
                 </div>
                 <div className="space-y-4 lg:space-y-6 pt-8 lg:pt-12">
                   <div className="relative h-48 lg:h-64 rounded-3xl overflow-hidden glass hover:shadow-xl transition-all duration-500">
-                    <img src="/images/menu/filter-coffee.jpg" alt="Filter coffee" className="w-full h-full object-cover" loading="lazy" />
+                    <img src={getAssetUrl('images/menu/filter-coffee.jpg')} alt="Filter coffee" className="w-full h-full object-cover" loading="lazy" />
                   </div>
                   <div className="relative h-64 lg:h-80 rounded-3xl overflow-hidden glass hover:shadow-xl transition-all duration-500">
-                    <img src="/images/menu/osmania-biscuit.jpg" alt="Osmania biscuits" className="w-full h-full object-cover" loading="lazy" />
+                    <img src={getAssetUrl('images/menu/osmania-biscuit.jpg')} alt="Osmania biscuits" className="w-full h-full object-cover" loading="lazy" />
                   </div>
                 </div>
               </div>
