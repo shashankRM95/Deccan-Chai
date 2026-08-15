@@ -2,12 +2,12 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyA_DemoKeyForFirebase12345',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyAGmiIv_JoXsIY2pp8OORPltgUJQZHNogY',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'deccan-chai.firebaseapp.com',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'deccan-chai',
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'deccan-chai.appspot.com',
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '123456789',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:123456789:web:abcdef12345',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'deccan-chai.firebasestorage.app',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '174389409021',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:174389409021:web:389904dfaf396fa56efa94',
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
