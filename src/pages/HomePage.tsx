@@ -70,7 +70,7 @@ export function HomePage() {
             </h1>
 
             <p className={`prose-body text-cream-200/80 text-lg max-w-xl ${mounted ? 'animate-fade-up [animation-delay:0.15s]' : 'opacity-0'}`}>
-              From a single outlet to 250+ stores nationwide — Deccan Chai carries the
+              From a single outlet to 400+ stores nationwide — Deccan Chai carries the
               warmth of Hyderabadi tradition. Strong, fragrant, soulful. Brewed fresh, every cup.
             </p>
 
@@ -178,10 +178,10 @@ export function HomePage() {
               <p className="prose-body text-lg mb-5">
                 Since August 2022, Deccan Chai has been brewing the way Hyderabadis
                 love it — strong, milky, and fragrant with cardamom. Word spread. Lines grew.
-                Soon, that single outlet became ten, then a hundred, then 250+.
+                Soon, that single outlet became ten, then a hundred, then 400+.
               </p>
               <p className="prose-body text-lg mb-8">
-                Today, Deccan Chai serves 1 Crore+ happy customers across 250+ stores. We still
+                Today, Deccan Chai serves 1 Crore+ happy customers across 400+ stores. We still
                 simmer our tea slow. And every cup still carries the warmth of Hyderabadi hospitality —
                 whether you're in Jubilee Hills or beyond.
               </p>

@@ -23,7 +23,7 @@ export function AboutPage() {
             <span className="text-gradient-gold">400 years of culture.</span>
           </h1>
           <p className="prose-body text-cream-200/80 text-lg max-w-xl mx-auto">
-            Hyderabadi Flavour since 2022. From a single outlet to 250+ stores —
+            Hyderabadi Flavour since 2022. From a single outlet to 400+ stores —
             our story is steeped in tradition, brewed with patience, and served with pride.
             Serving 1 Crore+ happy customers and 3 Crore+ cups and counting.
           </p>
@@ -45,7 +45,7 @@ export function AboutPage() {
             {[
               { year: '2022', title: 'The First Outlet', desc: 'Deccan Chai opens its first outlet in Hyderabad, serving strong Hyderabadi chai.' },
               { year: '2023', title: '50+ Outlets', desc: 'Word spreads across Hyderabad and Telangana. We open our 50th outlet.' },
-              { year: '2024', title: '250+ Outlets', desc: 'Deccan Chai expands across India with 250+ stores and 1 Crore+ happy customers.' },
+              { year: '2024', title: ' Outlets', desc: 'Deccan Chai expands across India with 400+ stores and 1 Crore+ happy customers.' },
               { year: '2025', title: '3 Crore+ Cups', desc: 'Today, Deccan Chai has served 3 Crore+ cups — and we are just getting started.' },
             ].map((item, i) => (
               <div key={item.year} className={`relative flex gap-6 lg:gap-0 mb-10 ${i % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}>
@@ -96,7 +96,7 @@ export function AboutPage() {
         <div className="container-px mx-auto max-w-5xl">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
             {[
-              { icon: MapPin, n: '250+', l: 'Outlets across India' },
+              { icon: MapPin, n: '400+', l: 'Outlets across India' },
               { icon: Users, n: '1 Cr+', l: 'Happy customers' },
               { icon: Coffee, n: '3 Cr+', l: 'Cups sold' },
               { icon: Award, n: '2022', l: 'Serving since' },
