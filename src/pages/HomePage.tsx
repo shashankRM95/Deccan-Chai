@@ -90,17 +90,17 @@ export function HomePage() {
               warmth of Hyderabadi tradition. Strong, fragrant, soulful. Brewed fresh, every cup.
             </p>
 
-            <div className={`flex flex-col items-start gap-3 ${mounted ? 'animate-fade-up [animation-delay:0.3s]' : 'opacity-0'}`}>
-              <button onClick={() => navigate('order')} className="btn-gold group">
+            <div className={`flex flex-nowrap items-center gap-2 sm:gap-3 ${mounted ? 'animate-fade-up [animation-delay:0.3s]' : 'opacity-0'}`}>
+              <button onClick={() => navigate('order')} className="btn-gold group shrink-0 text-xs sm:text-sm px-3 sm:px-5 py-2 sm:py-2.5">
                 Order on Table
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
-              <button onClick={() => navigate('menu')} className="btn-ghost">
-                Browse Full Menu
+              <button onClick={() => navigate('menu')} className="btn-ghost shrink-0 text-xs sm:text-sm px-3 sm:px-5 py-2 sm:py-2.5">
+                Browse Menu
               </button>
-              <button onClick={() => navigate('outlets')} className="btn-ghost">
-                <MapPin className="w-4 h-4" />
-                Find an Outlet
+              <button onClick={() => navigate('outlets')} className="btn-ghost shrink-0 text-xs sm:text-sm px-3 sm:px-5 py-2 sm:py-2.5 flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                Find Outlet
               </button>
             </div>
 
