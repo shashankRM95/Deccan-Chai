@@ -90,7 +90,7 @@ export function HomePage() {
               warmth of Hyderabadi tradition. Strong, fragrant, soulful. Brewed fresh, every cup.
             </p>
 
-            <div className={`flex flex-wrap items-center gap-3 ${mounted ? 'animate-fade-up [animation-delay:0.3s]' : 'opacity-0'}`}>
+            <div className={`flex flex-col items-start gap-3 ${mounted ? 'animate-fade-up [animation-delay:0.3s]' : 'opacity-0'}`}>
               <button onClick={() => navigate('order')} className="btn-gold group">
                 Order on Table
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
