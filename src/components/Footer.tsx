@@ -30,7 +30,7 @@ export function Footer() {
               </div>
             </div>
             <p className="prose-body text-cream-200/70 max-w-md text-sm">
-              Brewing heritage since 2022. From a single outlet to 250+ stores across India —
+              Brewing heritage since 2022. From a single outlet to 400+ stores across India —
               serving 1 Crore+ happy customers and 3 Crore+ cups. Every cup carries the warmth of Hyderabadi tradition.
             </p>
             <div className="flex items-center gap-3 mt-6">

@@ -165,7 +165,8 @@ function OrdersTab() {
     const { data } = await supabase
       .from('orders')
       .select('*, order_items(*), profiles(full_name, phone)')
-      .order('placed_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(100);
 
     if (data) setOrders(data);
     setLoading(false);
@@ -174,6 +175,7 @@ function OrdersTab() {
   useEffect(() => {
     fetchOrders();
 
+    // Realtime subscription for instant updates
     const channel = supabase
       .channel('owner-orders')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
@@ -181,8 +183,12 @@ function OrdersTab() {
       })
       .subscribe();
 
+    // Polling fallback every 10s (in case realtime isn't working)
+    const pollInterval = setInterval(fetchOrders, 10000);
+
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(pollInterval);
     };
   }, [fetchOrders]);
 
@@ -446,50 +452,63 @@ function InventoryTab() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newItem, setNewItem] = useState({ item_name: '', current_stock: '', min_stock: '', unit: 'kg' });
+  const [editingItem, setEditingItem] = useState<any | null>(null);
+  const [form, setForm] = useState({ item_name: '', current_stock: '', min_stock: '', unit: 'kg' });
 
   const fetchInventory = useCallback(async () => {
-    const { data } = await supabase.from('inventory').select('*');
-    if (data) {
-      setItems(data);
-    } else {
-      setItems([]);
-    }
+    const { data } = await supabase.from('inventory').select('*').order('created_at', { ascending: false });
+    if (data) setItems(data);
+    else setItems([]);
     setLoading(false);
   }, []);
 
   useEffect(() => { fetchInventory(); }, [fetchInventory]);
 
-  const handleAddItem = async (e: React.FormEvent) => {
+  const openAdd = () => {
+    setEditingItem(null);
+    setForm({ item_name: '', current_stock: '', min_stock: '', unit: 'kg' });
+    setIsModalOpen(true);
+  };
+
+  const openEdit = (item: any) => {
+    setEditingItem(item);
+    setForm({ item_name: item.item_name, current_stock: String(item.current_stock), min_stock: String(item.min_stock || 0), unit: item.unit });
+    setIsModalOpen(true);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newItem.item_name) return;
-    const currentStock = parseFloat(newItem.current_stock) || 0;
-    const minStock = parseFloat(newItem.min_stock) || 0;
+    const currentStock = parseFloat(form.current_stock) || 0;
+    const minStock = parseFloat(form.min_stock) || 0;
     const status = currentStock <= minStock * 0.5 ? 'CRITICAL' : currentStock <= minStock ? 'LOW' : 'OK';
+    const payload = { item_name: form.item_name, current_stock: currentStock, min_stock: minStock, unit: form.unit, status };
 
-    const itemObj = {
-      item_name: newItem.item_name,
-      current_stock: currentStock,
-      min_stock: minStock,
-      unit: newItem.unit,
-      status,
-    };
-
-    // Optimistic update
-    const tempId = `temp-${Date.now()}`;
-    setItems(prev => [...prev, { id: tempId, ...itemObj }]);
-    setIsModalOpen(false);
-    setNewItem({ item_name: '', current_stock: '', min_stock: '', unit: 'kg' });
-
-    const { data, error } = await supabase.from('inventory').insert([itemObj]).select().single();
-    if (data) {
-      // Replace temp with real
-      setItems(prev => prev.map(i => i.id === tempId ? data : i));
-    } else if (error) {
-      console.warn('Inventory insert error (table may not exist):', error.message);
-      // Keep optimistic item with temp id — visible in session
+    if (editingItem) {
+      // Edit mode
+      setItems(prev => prev.map(i => i.id === editingItem.id ? { ...i, ...payload } : i));
+      setIsModalOpen(false);
+      if (!editingItem.id.startsWith('temp-')) {
+        await supabase.from('inventory').update(payload).eq('id', editingItem.id);
+      }
+    } else {
+      // Add mode — optimistic
+      const tempId = `temp-${Date.now()}`;
+      setItems(prev => [...prev, { id: tempId, ...payload }]);
+      setIsModalOpen(false);
+      setForm({ item_name: '', current_stock: '', min_stock: '', unit: 'kg' });
+      const { data, error } = await supabase.from('inventory').insert([payload]).select().single();
+      if (data) setItems(prev => prev.map(i => i.id === tempId ? data : i));
+      else if (error) console.warn('Inventory insert error:', error.message);
     }
   };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this inventory item?')) return;
+    setItems(prev => prev.filter(i => i.id !== id));
+    if (!id.startsWith('temp-')) await supabase.from('inventory').delete().eq('id', id);
+  };
+
+  const statusColor = (s: string) => s === 'CRITICAL' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : s === 'LOW' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
 
   return (
     <div className="max-w-4xl space-y-5">
@@ -498,7 +517,7 @@ function InventoryTab() {
           <h1 className="heading text-2xl lg:text-3xl">Inventory Tracking</h1>
           <p className="text-xs text-navy-500 dark:text-cream-200/60 mt-0.5">Real raw materials and stock levels</p>
         </div>
-        <button onClick={() => setIsModalOpen(true)} className="btn-primary text-xs py-2.5 px-4 font-bold flex items-center gap-1.5">
+        <button onClick={openAdd} className="btn-primary text-xs py-2.5 px-4 font-bold flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Add Inventory Item
         </button>
       </div>
@@ -515,9 +534,10 @@ function InventoryTab() {
             <thead className="bg-cream-100 dark:bg-navy-800 text-xs uppercase tracking-wide text-navy-500 dark:text-cream-200/60">
               <tr>
                 <th className="text-left px-4 py-3 font-semibold">Item</th>
-                <th className="text-right px-4 py-3 font-semibold">Current Stock</th>
-                <th className="text-right px-4 py-3 font-semibold hidden sm:table-cell">Min Stock</th>
+                <th className="text-right px-4 py-3 font-semibold">Stock</th>
+                <th className="text-right px-4 py-3 font-semibold hidden sm:table-cell">Min</th>
                 <th className="text-center px-4 py-3 font-semibold">Status</th>
+                <th className="text-center px-4 py-3 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-cream-200/50 dark:divide-cream-100/5">
@@ -527,9 +547,15 @@ function InventoryTab() {
                   <td className="px-4 py-3 text-right font-bold text-navy-900 dark:text-cream-50">{item.current_stock} {item.unit}</td>
                   <td className="px-4 py-3 text-right text-navy-600 dark:text-cream-200/70 hidden sm:table-cell">{item.min_stock} {item.unit}</td>
                   <td className="px-4 py-3 text-center">
-                    <span className="inline-flex items-center gap-1 rounded-full text-[10px] font-bold px-2.5 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                    <span className={`inline-flex items-center gap-1 rounded-full text-[10px] font-bold px-2.5 py-1 ${statusColor(item.status || 'OK')}`}>
                       {item.status || 'OK'}
                     </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <button onClick={() => openEdit(item)} className="p-1.5 rounded-lg text-navy-600 hover:bg-cream-100 dark:text-cream-200 dark:hover:bg-navy-700 transition-colors"><Edit2 className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -542,26 +568,30 @@ function InventoryTab() {
         <div className="fixed inset-0 z-50 glass-overlay grid place-items-center p-4">
           <div className="card p-6 max-w-md w-full space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-sans font-bold text-lg text-navy-900 dark:text-cream-50">Add Inventory Item</h2>
+              <h2 className="font-sans font-bold text-lg text-navy-900 dark:text-cream-50">{editingItem ? 'Edit Inventory Item' : 'Add Inventory Item'}</h2>
               <button onClick={() => setIsModalOpen(false)} className="text-navy-400"><X className="w-5 h-5" /></button>
             </div>
-            <form onSubmit={handleAddItem} className="space-y-3 text-xs">
+            <form onSubmit={handleSave} className="space-y-3 text-xs">
               <div>
                 <label className="block font-semibold mb-1">Item Name</label>
-                <input required value={newItem.item_name} onChange={e => setNewItem({ ...newItem, item_name: e.target.value })} placeholder="e.g. Assam Tea Leaves" className="w-full rounded-xl px-3 py-2 bg-cream-50 dark:bg-navy-800 border" />
+                <input required value={form.item_name} onChange={e => setForm({ ...form, item_name: e.target.value })} placeholder="e.g. Assam Tea Leaves" className="w-full rounded-xl px-3 py-2 bg-cream-50 dark:bg-navy-800 border" />
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <div>
                   <label className="block font-semibold mb-1">Current Stock</label>
-                  <input required type="number" value={newItem.current_stock} onChange={e => setNewItem({ ...newItem, current_stock: e.target.value })} placeholder="10" className="w-full rounded-xl px-3 py-2 bg-cream-50 dark:bg-navy-800 border" />
+                  <input required type="number" value={form.current_stock} onChange={e => setForm({ ...form, current_stock: e.target.value })} placeholder="10" className="w-full rounded-xl px-3 py-2 bg-cream-50 dark:bg-navy-800 border" />
+                </div>
+                <div>
+                  <label className="block font-semibold mb-1">Min Stock</label>
+                  <input type="number" value={form.min_stock} onChange={e => setForm({ ...form, min_stock: e.target.value })} placeholder="2" className="w-full rounded-xl px-3 py-2 bg-cream-50 dark:bg-navy-800 border" />
                 </div>
                 <div>
                   <label className="block font-semibold mb-1">Unit</label>
-                  <input required value={newItem.unit} onChange={e => setNewItem({ ...newItem, unit: e.target.value })} placeholder="kg / liters / pcs" className="w-full rounded-xl px-3 py-2 bg-cream-50 dark:bg-navy-800 border" />
+                  <input required value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })} placeholder="kg / L / pcs" className="w-full rounded-xl px-3 py-2 bg-cream-50 dark:bg-navy-800 border" />
                 </div>
               </div>
               <div className="flex gap-2 pt-2">
-                <button type="submit" className="btn-primary flex-1 py-2 text-xs">Add Item</button>
+                <button type="submit" className="btn-primary flex-1 py-2 text-xs">{editingItem ? 'Save Changes' : 'Add Item'}</button>
                 <button type="button" onClick={() => setIsModalOpen(false)} className="btn-outline flex-1 py-2 text-xs">Cancel</button>
               </div>
             </form>
@@ -572,12 +602,188 @@ function InventoryTab() {
   );
 }
 
-/* ============ STAFF MANAGEMENT (ATTENDANCE & REAL DATA) ============ */
+
+/* ============ STAFF MANAGEMENT ============ */
 function StaffTab() {
   const [staff, setStaff] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newStaff, setNewStaff] = useState({ name: '', phone: '', role: 'Tea Maker', shift: 'Morning' });
+  const [editingStaff, setEditingStaff] = useState<any | null>(null);
+  const [form, setForm] = useState({ name: '', phone: '', role: 'Tea Maker', shift: 'Morning' });
+
+  const fetchStaff = useCallback(async () => {
+    const { data } = await supabase.from('staff').select('*').order('created_at', { ascending: true });
+    if (data) setStaff(data);
+    else setStaff([]);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchStaff(); }, [fetchStaff]);
+
+  const togglePresent = async (id: string, present: boolean) => {
+    setStaff(prev => prev.map(s => s.id === id ? { ...s, present: !present } : s));
+    if (!id.startsWith('temp-')) {
+      await supabase.from('staff').update({ present: !present }).eq('id', id);
+    }
+  };
+
+  const openAdd = () => {
+    setEditingStaff(null);
+    setForm({ name: '', phone: '', role: 'Tea Maker', shift: 'Morning' });
+    setIsModalOpen(true);
+  };
+
+  const openEdit = (s: any) => {
+    setEditingStaff(s);
+    setForm({ name: s.name, phone: s.phone || '', role: s.role, shift: s.shift });
+    setIsModalOpen(true);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name) return;
+    const payload = { name: form.name, phone: form.phone || '+91 98000 00000', role: form.role, shift: form.shift };
+
+    if (editingStaff) {
+      setStaff(prev => prev.map(s => s.id === editingStaff.id ? { ...s, ...payload } : s));
+      setIsModalOpen(false);
+      if (!editingStaff.id.startsWith('temp-')) {
+        await supabase.from('staff').update(payload).eq('id', editingStaff.id);
+      }
+    } else {
+      const staffObj = { ...payload, present: true };
+      const tempId = `temp-${Date.now()}`;
+      setStaff(prev => [...prev, { id: tempId, ...staffObj }]);
+      setIsModalOpen(false);
+      setForm({ name: '', phone: '', role: 'Tea Maker', shift: 'Morning' });
+      const { data, error } = await supabase.from('staff').insert([staffObj]).select().single();
+      if (data) setStaff(prev => prev.map(s => s.id === tempId ? data : s));
+      else if (error) console.warn('Staff insert error:', error.message);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Remove this staff member?')) return;
+    setStaff(prev => prev.filter(s => s.id !== id));
+    if (!id.startsWith('temp-')) await supabase.from('staff').delete().eq('id', id);
+  };
+
+  const presentCount = staff.filter(s => s.present).length;
+
+  return (
+    <div className="max-w-4xl space-y-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="heading text-2xl lg:text-3xl">Staff Management</h1>
+          <p className="text-xs text-navy-500 dark:text-cream-200/60 mt-0.5">Track employees and toggle attendance</p>
+        </div>
+        <button onClick={openAdd} className="btn-primary text-xs py-2.5 px-4 font-bold flex items-center gap-1.5">
+          <Plus className="w-4 h-4" /> Add Staff Member
+        </button>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div className="card p-4 text-center">
+          <p className="font-sans font-extrabold text-2xl text-green-600 dark:text-green-400">{presentCount}</p>
+          <p className="text-xs text-navy-500 dark:text-cream-200/60">Present</p>
+        </div>
+        <div className="card p-4 text-center">
+          <p className="font-sans font-extrabold text-2xl text-red-500">{staff.length - presentCount}</p>
+          <p className="text-xs text-navy-500 dark:text-cream-200/60">Absent</p>
+        </div>
+        <div className="card p-4 text-center">
+          <p className="font-sans font-extrabold text-2xl text-navy-900 dark:text-cream-50">{staff.length}</p>
+          <p className="text-xs text-navy-500 dark:text-cream-200/60">Total Staff</p>
+        </div>
+      </div>
+
+      {loading ? <div className="grid place-items-center py-20"><Loader2 className="w-8 h-8 animate-spin text-maroon-700" /></div> : staff.length === 0 ? (
+        <div className="card p-10 text-center">
+          <Users className="w-10 h-10 text-navy-300 dark:text-cream-200/20 mx-auto mb-3" />
+          <p className="font-sans font-bold text-navy-900 dark:text-cream-50">No staff members registered</p>
+          <p className="text-xs text-navy-500 dark:text-cream-200/60 mt-1">Click 'Add Staff Member' to create employee records.</p>
+        </div>
+      ) : (
+        <div className="card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-cream-100 dark:bg-navy-800 text-xs uppercase tracking-wide text-navy-500 dark:text-cream-200/60">
+              <tr>
+                <th className="text-left px-4 py-3 font-semibold">Name</th>
+                <th className="text-left px-4 py-3 font-semibold hidden sm:table-cell">Role</th>
+                <th className="text-left px-4 py-3 font-semibold hidden sm:table-cell">Shift</th>
+                <th className="text-center px-4 py-3 font-semibold">Attendance</th>
+                <th className="text-center px-4 py-3 font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-cream-200/50 dark:divide-cream-100/5">
+              {staff.map(s => (
+                <tr key={s.id} className="hover:bg-cream-50 dark:hover:bg-navy-800/50">
+                  <td className="px-4 py-3">
+                    <p className="font-sans font-bold text-navy-900 dark:text-cream-50">{s.name}</p>
+                    <p className="text-xs text-navy-400 dark:text-cream-200/50">{s.phone}</p>
+                  </td>
+                  <td className="px-4 py-3 text-navy-600 dark:text-cream-200/70 hidden sm:table-cell">{s.role}</td>
+                  <td className="px-4 py-3 text-navy-600 dark:text-cream-200/70 hidden sm:table-cell">{s.shift}</td>
+                  <td className="px-4 py-3 text-center">
+                    <button
+                      onClick={() => togglePresent(s.id, s.present)}
+                      className={`inline-flex items-center rounded-full text-xs font-extrabold px-3 py-1.5 transition-all shadow-sm ${
+                        s.present ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-red-500 text-white hover:bg-red-600'
+                      }`}
+                    >
+                      {s.present ? '✓ Present' : '✕ Absent'}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <button onClick={() => openEdit(s)} className="p-1.5 rounded-lg text-navy-600 hover:bg-cream-100 dark:text-cream-200 dark:hover:bg-navy-700 transition-colors"><Edit2 className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 glass-overlay grid place-items-center p-4">
+          <div className="card p-6 max-w-md w-full space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-sans font-bold text-lg text-navy-900 dark:text-cream-50">{editingStaff ? 'Edit Staff Member' : 'Add Staff Member'}</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-navy-400"><X className="w-5 h-5" /></button>
+            </div>
+            <form onSubmit={handleSave} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-semibold mb-1">Full Name</label>
+                <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Rahul Verma" className="w-full rounded-xl px-3 py-2 bg-cream-50 dark:bg-navy-800 border" />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Phone Number</label>
+                <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 98765 43210" className="w-full rounded-xl px-3 py-2 bg-cream-50 dark:bg-navy-800 border" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-semibold mb-1">Role</label>
+                  <input value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} placeholder="Tea Maker / Server" className="w-full rounded-xl px-3 py-2 bg-cream-50 dark:bg-navy-800 border" />
+                </div>
+                <div>
+                  <label className="block font-semibold mb-1">Shift</label>
+                  <input value={form.shift} onChange={e => setForm({ ...form, shift: e.target.value })} placeholder="Morning / Evening" className="w-full rounded-xl px-3 py-2 bg-cream-50 dark:bg-navy-800 border" />
+                </div>
+              </div>
+              <div className="flex gap-2 pt-2">
+                <button type="submit" className="btn-primary flex-1 py-2 text-xs">{editingStaff ? 'Save Changes' : 'Add Staff'}</button>
+                <button type="button" onClick={() => setIsModalOpen(false)} className="btn-outline flex-1 py-2 text-xs">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
   const fetchStaff = useCallback(async () => {
     const { data } = await supabase.from('staff').select('*');

@@ -158,7 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const pendingData = { code: generatedCode, expiresAt: Date.now() + 5 * 60 * 1000 };
+    const pendingData = { code: generatedCode, expiresAt: Date.now() + 10 * 60 * 1000 };
     localStorage.setItem(`pending_otp_${targetKey}`, JSON.stringify(pendingData));
 
     return { error: null, code: generatedCode, isDemo: true };
@@ -196,6 +196,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
 
+    // 1) Try real Supabase OTP verification first
     try {
       const res = type === 'email'
         ? await supabase.auth.verifyOtp({ email: emailOrPhone, token: cleanToken, type: 'email' })
@@ -205,16 +206,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('demo_user_session');
         localStorage.removeItem(`pending_otp_${targetKey}`);
         localStorage.setItem('role', activeRole);
+        // Mark this device as verified for this email (skip OTP next time)
+        localStorage.setItem(`otp_verified_${targetKey}`, JSON.stringify({ role: activeRole, verifiedAt: Date.now() }));
         setUser(res.data.user);
         await fetchProfile(res.data.user.id);
         return { error: null };
       }
     } catch {
-      // fallback check below
+      // fallback to local code check below
     }
 
+    // 2) Check local pending OTP code — MUST match exactly, length alone is NOT enough
     const pendingStr = localStorage.getItem(`pending_otp_${targetKey}`);
-    let isValidCode = cleanToken.length === 6 || cleanToken.length === 8;
+    let isValidCode = false;
     if (pendingStr) {
       try {
         const pending = JSON.parse(pendingStr);
@@ -222,13 +226,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           isValidCode = true;
         }
       } catch {
-        // ignore JSON error
+        // ignore JSON parse error
       }
     }
 
     if (isValidCode) {
       localStorage.removeItem(`pending_otp_${targetKey}`);
       localStorage.setItem('role', activeRole);
+      // Mark this device as verified for skip-OTP on return visits
+      localStorage.setItem(`otp_verified_${targetKey}`, JSON.stringify({ role: activeRole, verifiedAt: Date.now() }));
       const mockId = 'otp-user-' + Math.abs(targetKey.split('').reduce((a, b) => (a << 5) - a + b.charCodeAt(0), 0));
       const isEmail = type === 'email';
       const mockUser: any = {
@@ -254,7 +260,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: null };
     }
 
-    return { error: 'Invalid verification code. Enter the code from the notification box or code 123456.' };
+    return { error: 'Invalid OTP code. Please check the code sent to your email and try again.' };
   }, [fetchProfile]);
 
   const resetPassword = useCallback(async (email: string) => {

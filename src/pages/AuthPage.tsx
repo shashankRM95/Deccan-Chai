@@ -88,10 +88,13 @@ export function AuthPage({ mode }: Props) {
           navigate('customer-dashboard');
         }
       } else {
+        // Clear any stale demo session before real password login
+        localStorage.removeItem('demo_user_session');
         const { error: err } = await signIn(email, password);
         if (err) setError(err);
         else {
-          localStorage.setItem('role', isOwner ? 'owner' : 'customer');
+          const targetRole = isOwner ? 'owner' : 'customer';
+          localStorage.setItem('role', targetRole);
           navigate(isOwner ? 'owner-dashboard' : 'customer-dashboard');
         }
       }
@@ -124,6 +127,26 @@ export function AuthPage({ mode }: Props) {
       return;
     }
 
+    // Check if this device already verified this email (skip OTP for returning users)
+    const verifiedKey = `otp_verified_${target.trim().toLowerCase()}`;
+    const verifiedStr = localStorage.getItem(verifiedKey);
+    if (verifiedStr) {
+      try {
+        const verified = JSON.parse(verifiedStr);
+        const demoSessionStr = localStorage.getItem('demo_user_session');
+        if (demoSessionStr) {
+          const demoSession = JSON.parse(demoSessionStr);
+          const targetRole = isOwner ? 'owner' : (verified.role || 'customer');
+          localStorage.setItem('role', targetRole);
+          navigate(targetRole === 'owner' ? 'owner-dashboard' : 'customer-dashboard');
+          return;
+        }
+      } catch {
+        // stale entry — proceed with OTP
+        localStorage.removeItem(verifiedKey);
+      }
+    }
+
     setLoading(true);
     try {
       const res = await sendOtp(target, otpChannel);
@@ -133,7 +156,7 @@ export function AuthPage({ mode }: Props) {
         if (res.code) setGeneratedCode(res.code);
         setOtpSent(true);
         setResendTimer(60);
-        setOtpSuccessMsg(`OTP Code dispatched to ${target}. Please check your ${otpChannel === 'email' ? 'Gmail Inbox / Spam' : 'SMS Messages'}.`);
+        setOtpSuccessMsg(`OTP code sent to ${target}. Check your ${otpChannel === 'email' ? 'inbox / spam folder' : 'SMS messages'}.`);
       }
     } catch {
       setError('Failed to send OTP. Please try again.');
@@ -149,6 +172,10 @@ export function AuthPage({ mode }: Props) {
     const target = getFormattedTarget();
     if (!otpToken.trim()) {
       setError('Please enter the 6-digit OTP code.');
+      return;
+    }
+    if (otpToken.trim().length !== 6) {
+      setError('OTP must be exactly 6 digits. Please check the code in your email.');
       return;
     }
 
@@ -197,7 +224,7 @@ export function AuthPage({ mode }: Props) {
                 ? 'Authorized owner access — sign in with OTP or password'
                 : isSignUp
                 ? 'Join Deccan Chai and start ordering'
-                : 'Enter your Gmail / Email address to receive 6-digit OTP code'}
+                : 'Enter your email address to receive your 6-digit OTP code'}
             </p>
           </div>
 
@@ -299,8 +326,8 @@ export function AuthPage({ mode }: Props) {
                       <span className="text-[10px] bg-emerald-500 text-navy-950 font-bold px-2 py-0.5 rounded-full">Sent</span>
                     </div>
                     <p className="text-xs text-cream-200/90 leading-relaxed">
-                      Verification code sent to <strong>{getFormattedTarget()}</strong>.
-                      Please check your {otpChannel === 'email' ? 'email inbox / spam folder for your 6-digit OTP code.' : 'mobile SMS text messages.' }
+                      A 6-digit verification code was sent to <strong>{getFormattedTarget()}</strong>.
+                      Please check your {otpChannel === 'email' ? 'inbox or spam folder.' : 'mobile SMS messages.'}
                     </p>
                   </div>
 
@@ -321,15 +348,17 @@ export function AuthPage({ mode }: Props) {
                     </button>
                   </div>
 
-                  <Field icon={KeyRound} label="Enter OTP Code Received">
+                  <Field icon={KeyRound} label="Enter 6-Digit OTP Code">
                     <input
                       type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       required
-                      maxLength={8}
+                      maxLength={6}
                       autoComplete="one-time-code"
                       value={otpToken}
-                      onChange={(e) => setOtpToken(e.target.value)}
-                      placeholder="Enter verification code"
+                      onChange={(e) => setOtpToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="Enter 6-digit code"
                       className="w-full bg-transparent focus:outline-none text-sm tracking-widest font-mono text-navy-900 dark:text-cream-50"
                     />
                   </Field>

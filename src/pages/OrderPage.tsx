@@ -81,9 +81,27 @@ function OrderPageInner({
 
   useEffect(() => {
     // Fetch table count from outlets
-    supabase.from('outlets').select('table_count').limit(1).maybeSingle().then(({ data }) => {
-      if (data?.table_count) setTableCount(data.table_count);
-    });
+    const fetchTableCount = () => {
+      supabase.from('outlets').select('table_count').limit(1).maybeSingle().then(({ data }) => {
+        if (data?.table_count) setTableCount(data.table_count);
+      });
+    };
+    fetchTableCount();
+
+    // Listen for owner table count updates (same tab / same browser)
+    const handleSettingsUpdate = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.table_count) setTableCount(detail.table_count);
+    };
+    window.addEventListener('deccan_store_settings_updated', handleSettingsUpdate);
+
+    // Supabase realtime: update table count when outlets row changes
+    const channel = supabase
+      .channel('outlets-table-count')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'outlets' }, (payload) => {
+        if (payload.new?.table_count) setTableCount(payload.new.table_count);
+      })
+      .subscribe();
 
     // Fetch menu items
     supabase.from('menu_items').select('*').eq('available', true).order('sort_order').then(({ data }) => {
@@ -96,6 +114,11 @@ function OrderPageInner({
       }
       setItemsLoading(false);
     });
+
+    return () => {
+      window.removeEventListener('deccan_store_settings_updated', handleSettingsUpdate);
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const tables = Array.from({ length: tableCount }, (_, i) => i + 1);
