@@ -147,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Only email goes here now for Demo fallback (if Supabase email fails)
-    const generatedCode = Math.floor(10000000 + Math.random() * 90000000).toString();
+    const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
     const pendingData = { code: generatedCode, expiresAt: Date.now() + 10 * 60 * 1000 };
     localStorage.setItem(`pending_otp_${targetKey}`, JSON.stringify(pendingData));
 
