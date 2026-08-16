@@ -55,7 +55,7 @@ export function AuthPage({ mode }: Props) {
   const [otpPhone, setOtpPhone] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpToken, setOtpToken] = useState('');
-  const [generatedCode, setGeneratedCode] = useState<string>('123456');
+  const [generatedCode, setGeneratedCode] = useState<string>((Math.floor(10000000 + Math.random() * 90000000)).toString());
   const [resendTimer, setResendTimer] = useState(0);
   const [otpSuccessMsg, setOtpSuccessMsg] = useState<string | null>(null);
   const [showSmtpGuide, setShowSmtpGuide] = useState(false);
@@ -171,11 +171,11 @@ export function AuthPage({ mode }: Props) {
 
     const target = getFormattedTarget();
     if (!otpToken.trim()) {
-      setError('Please enter the 6-digit OTP code.');
+      setError('Please enter the 8-digit OTP code.');
       return;
     }
-    if (otpToken.trim().length !== 6) {
-      setError('OTP must be exactly 6 digits. Please check the code in your email.');
+    if (otpToken.trim().length !== 8) {
+      setError('OTP must be exactly 8 digits. Please check the code in your email.');
       return;
     }
 
@@ -224,7 +224,7 @@ export function AuthPage({ mode }: Props) {
                 ? 'Authorized owner access — sign in with OTP or password'
                 : isSignUp
                 ? 'Join Deccan Chai and start ordering'
-                : 'Enter your email address to receive your 6-digit OTP code'}
+                : 'Enter your email address to receive your 8-digit OTP code'}
             </p>
           </div>
 
@@ -326,7 +326,7 @@ export function AuthPage({ mode }: Props) {
                       <span className="text-[10px] bg-emerald-500 text-navy-950 font-bold px-2 py-0.5 rounded-full">Sent</span>
                     </div>
                     <p className="text-xs text-cream-200/90 leading-relaxed">
-                      A 6-digit verification code was sent to <strong>{getFormattedTarget()}</strong>.
+                      An 8-digit verification code was sent to <strong>{getFormattedTarget()}</strong>.
                       Please check your {otpChannel === 'email' ? 'inbox or spam folder.' : 'mobile SMS messages.'}
                     </p>
                   </div>
@@ -348,17 +348,17 @@ export function AuthPage({ mode }: Props) {
                     </button>
                   </div>
 
-                  <Field icon={KeyRound} label="Enter 6-Digit OTP Code">
+                  <Field icon={KeyRound} label="Enter 8-Digit OTP Code">
                     <input
                       type="text"
                       inputMode="numeric"
                       pattern="[0-9]*"
                       required
-                      maxLength={6}
+                      maxLength={8}
                       autoComplete="one-time-code"
                       value={otpToken}
-                      onChange={(e) => setOtpToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      placeholder="Enter 6-digit code"
+                      onChange={(e) => setOtpToken(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                      placeholder="Enter 8-digit code"
                       className="w-full bg-transparent focus:outline-none text-sm tracking-widest font-mono text-navy-900 dark:text-cream-50"
                     />
                   </Field>
