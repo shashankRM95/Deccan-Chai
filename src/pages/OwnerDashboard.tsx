@@ -358,7 +358,12 @@ function MenuMgmtTab() {
     if (editingItem.id) {
       await supabase.from('menu_items').update(payload).eq('id', editingItem.id);
     } else {
-      await supabase.from('menu_items').insert([payload]);
+      const { error } = await supabase.from('menu_items').insert([payload]);
+      if (error) {
+        console.error('Insert error:', error);
+        alert(`Failed to add menu item: ${error.message}`);
+        return;
+      }
     }
 
     setIsModalOpen(false);
@@ -889,6 +894,46 @@ function StoreSettingsTab() {
   });
   const [tableSaving, setTableSaving] = useState(false);
   const [tableSaved, setTableSaved] = useState(false);
+  
+  const [storeDetails, setStoreDetails] = useState({
+    name: 'Deccan Chai - Jubilee Hills',
+    phone: '+91 9852128128',
+    address: 'Jubilee Hills, Hyderabad, Telangana',
+    hours: 'Mon - Sat: 9:00 AM - 7:00 PM',
+  });
+  const [detailsSaving, setDetailsSaving] = useState(false);
+  const [detailsSaved, setDetailsSaved] = useState(false);
+  const [outletId, setOutletId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchOutlet = async () => {
+      const { data } = await supabase.from('outlets').select('*').limit(1).maybeSingle();
+      if (data) {
+        setOutletId(data.id);
+        setStoreDetails({
+          name: data.name,
+          phone: data.phone || '',
+          address: data.address,
+          hours: data.hours || '',
+        });
+      }
+    };
+    fetchOutlet();
+  }, []);
+
+  const saveStoreDetails = async () => {
+    if (!outletId) return;
+    setDetailsSaving(true);
+    await supabase.from('outlets').update({
+      name: storeDetails.name,
+      phone: storeDetails.phone,
+      address: storeDetails.address,
+      hours: storeDetails.hours,
+    }).eq('id', outletId);
+    setDetailsSaving(false);
+    setDetailsSaved(true);
+    setTimeout(() => setDetailsSaved(false), 2000);
+  };
 
   const saveTableCount = async (count: number) => {
     setTableSaving(true);
@@ -955,34 +1000,90 @@ function StoreSettingsTab() {
 
       <div className="card p-5 space-y-4">
         <h2 className="font-sans font-bold text-navy-900 dark:text-cream-50">General Store Details</h2>
-        <SettingField label="Store Name" value="Deccan Chai - Jubilee Hills" />
-        <SettingField label="Phone" value="+91 9852128128" />
-        <SettingField label="Address" value="Jubilee Hills, Hyderabad, Telangana" />
-        <SettingField label="Opening Hours" value="Mon - Sat: 9:00 AM - 7:00 PM" />
+        <SettingField label="Store Name" value={storeDetails.name} onChange={v => setStoreDetails({ ...storeDetails, name: v })} />
+        <SettingField label="Phone" value={storeDetails.phone} onChange={v => setStoreDetails({ ...storeDetails, phone: v })} />
+        <SettingField label="Address" value={storeDetails.address} onChange={v => setStoreDetails({ ...storeDetails, address: v })} />
+        <SettingField label="Opening Hours" value={storeDetails.hours} onChange={v => setStoreDetails({ ...storeDetails, hours: v })} />
+        <button
+          onClick={saveStoreDetails}
+          disabled={detailsSaving}
+          className="btn-primary text-sm py-2.5 w-full sm:w-auto"
+        >
+          {detailsSaving ? 'Saving...' : detailsSaved ? 'Saved! ✓' : 'Save Store Details'}
+        </button>
       </div>
     </div>
   );
 }
 
-function SettingField({ label, value }: { label: string; value: string }) {
+function SettingField({ label, value, onChange }: { label: string; value: string; onChange: (val: string) => void }) {
   return (
     <div>
       <label className="block text-xs font-semibold uppercase tracking-[0.1em] text-navy-500 dark:text-cream-200/60 mb-1.5">{label}</label>
-      <input defaultValue={value} className="w-full rounded-xl px-4 py-2.5 text-sm bg-cream-50 dark:bg-navy-800 border border-cream-300 dark:border-cream-100/10 text-navy-900 dark:text-cream-50" />
+      <input 
+        value={value} 
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-xl px-4 py-2.5 text-sm bg-cream-50 dark:bg-navy-800 border border-cream-300 dark:border-cream-100/10 text-navy-900 dark:text-cream-50" 
+      />
     </div>
   );
 }
 
 /* ============ REPORTS ============ */
 function ReportsTab() {
+  const [loadingReport, setLoadingReport] = useState<string | null>(null);
+
   const reports = [
-    { label: 'Daily Sales Report', format: 'PDF', icon: FileText },
-    { label: 'Weekly Analytics', format: 'Excel', icon: BarChart3 },
-    { label: 'Inventory Report', format: 'PDF', icon: Package },
+    { label: 'Daily Sales Report', format: 'TXT', icon: FileText },
+    { label: 'Weekly Analytics', format: 'TXT', icon: BarChart3 },
+    { label: 'Inventory Report', format: 'TXT', icon: Package },
   ];
 
-  const handleDownload = (label: string) => {
-    const content = `Deccan Chai Report: ${label}\nGenerated: ${new Date().toISOString()}`;
+  const handleDownload = async (label: string) => {
+    setLoadingReport(label);
+    let content = `Deccan Chai Report: ${label}\nGenerated: ${new Date().toLocaleString()}\n\n`;
+
+    if (label === 'Daily Sales Report' || label === 'Weekly Analytics') {
+      const { data: orders } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+      if (orders) {
+        let relevantOrders = orders;
+        if (label === 'Daily Sales Report') {
+          const today = new Date().toDateString();
+          relevantOrders = orders.filter((o: any) => new Date(o.placed_at || o.created_at).toDateString() === today);
+        } else {
+          // Weekly: last 7 days
+          const lastWeek = new Date();
+          lastWeek.setDate(lastWeek.getDate() - 7);
+          relevantOrders = orders.filter((o: any) => new Date(o.placed_at || o.created_at) > lastWeek);
+        }
+
+        const totalSales = relevantOrders.reduce((sum: number, o: any) => sum + parseFloat(o.total || 0), 0);
+        const completed = relevantOrders.filter((o: any) => o.status === 'Served' || o.status === 'Ready').length;
+        
+        content += `Total Orders: ${relevantOrders.length}\n`;
+        content += `Completed Orders: ${completed}\n`;
+        content += `Total Revenue: Rs. ${totalSales.toFixed(2)}\n\n`;
+        content += `ORDER DETAILS:\n`;
+        content += `--------------------------------------------------\n`;
+        relevantOrders.forEach((o: any) => {
+          content += `Order #${o.order_number || o.id.slice(0,8)} | Time: ${new Date(o.created_at || o.placed_at).toLocaleTimeString()} | Total: Rs. ${o.total} | Status: ${o.status}\n`;
+        });
+      } else {
+        content += `No orders found.\n`;
+      }
+    } else if (label === 'Inventory Report') {
+      const { data: inventory } = await supabase.from('inventory').select('*');
+      if (inventory) {
+        content += `INVENTORY STATUS:\n`;
+        content += `--------------------------------------------------\n`;
+        inventory.forEach((item: any) => {
+          content += `${item.item_name}: ${item.current_stock} ${item.unit} (Min: ${item.min_stock}) - Status: ${item.status}\n`;
+        });
+      } else {
+        content += `No inventory items found.\n`;
+      }
+    }
+
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -990,6 +1091,7 @@ function ReportsTab() {
     link.download = `${label.toLowerCase().replace(/\s+/g, '_')}.txt`;
     link.click();
     URL.revokeObjectURL(url);
+    setLoadingReport(null);
   };
 
   return (
@@ -997,13 +1099,18 @@ function ReportsTab() {
       <h1 className="heading text-2xl lg:text-3xl">Reports & Exports</h1>
       <div className="grid sm:grid-cols-2 gap-3">
         {reports.map(r => (
-          <button key={r.label} onClick={() => handleDownload(r.label)} className="card p-4 flex items-center gap-3 hover:shadow-md transition-all text-left">
+          <button 
+            key={r.label} 
+            onClick={() => handleDownload(r.label)} 
+            disabled={loadingReport !== null}
+            className={`card p-4 flex items-center gap-3 transition-all text-left ${loadingReport === r.label ? 'opacity-70' : 'hover:shadow-md'}`}
+          >
             <div className="grid place-items-center w-10 h-10 rounded-xl bg-maroon-50 dark:bg-navy-800 text-maroon-700 dark:text-gold-300">
-              <r.icon className="w-5 h-5" />
+              {loadingReport === r.label ? <Loader2 className="w-5 h-5 animate-spin" /> : <r.icon className="w-5 h-5" />}
             </div>
             <div className="flex-1">
               <p className="font-sans font-bold text-sm text-navy-900 dark:text-cream-50">{r.label}</p>
-              <p className="text-xs text-navy-500 dark:text-cream-200/60">{r.format} Download</p>
+              <p className="text-xs text-navy-500 dark:text-cream-200/60">{loadingReport === r.label ? 'Generating...' : `${r.format} Download`}</p>
             </div>
             <ArrowRight className="w-4 h-4 text-navy-400" />
           </button>

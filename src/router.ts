@@ -6,7 +6,6 @@ export type Route =
   | 'order'
   | 'outlets'
   | 'about'
-  | 'login'
   | 'customer-login'
   | 'owner-login'
   | 'customer-dashboard'
@@ -26,7 +25,7 @@ export function parseHash(): { route: Route; params: Record<string, string> } {
     });
   }
   const validRoutes: Route[] = [
-    'home', 'menu', 'order', 'outlets', 'about', 'login',
+    'home', 'menu', 'order', 'outlets', 'about',
     'customer-login', 'owner-login', 'customer-dashboard', 'owner-dashboard', 'signup',
   ];
   const route = validRoutes.includes(path as Route) ? (path as Route) : 'home';

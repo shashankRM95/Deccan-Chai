@@ -121,8 +121,8 @@ export function Navbar({ darkMode, toggleDark }: { darkMode: boolean; toggleDark
               {profile?.full_name?.split(' ')[0] || 'Account'}
             </button>
           ) : (
-            <button
-              onClick={() => go('login')}
+              <button
+              onClick={() => go('customer-login')}
               className="hidden sm:flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold text-maroon-800 dark:text-gold-300 hover:bg-maroon-50 dark:hover:bg-navy-800 transition-colors"
             >
               <User className="w-3.5 h-3.5" /> Login
@@ -178,7 +178,7 @@ export function Navbar({ darkMode, toggleDark }: { darkMode: boolean; toggleDark
                   <LayoutDashboard className="w-4 h-4" /> Dashboard
                 </button>
               ) : (
-                <button onClick={() => go('login')} className="btn-outline flex-1">
+                <button onClick={() => go('customer-login')} className="btn-outline flex-1">
                   <User className="w-4 h-4" /> Login
                 </button>
               )}

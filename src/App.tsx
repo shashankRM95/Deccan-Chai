@@ -9,8 +9,8 @@ import { MenuPage } from '@/pages/MenuPage';
 import { OrderPage } from '@/pages/OrderPage';
 import { OutletsPage } from '@/pages/OutletsPage';
 import { AboutPage } from '@/pages/AboutPage';
-import { LoginPage } from '@/pages/LoginPage';
-import { AuthPage } from '@/pages/AuthPage';
+import { CustomerLoginPage } from '@/pages/CustomerLoginPage';
+import { OwnerLoginPage } from '@/pages/OwnerLoginPage';
 import { CustomerDashboard } from '@/pages/CustomerDashboard';
 import { OwnerDashboard } from '@/pages/OwnerDashboard';
 
@@ -33,7 +33,7 @@ function App() {
   const toggleDark = () => setDarkMode((d) => !d);
 
   const isDashboard = route === 'customer-dashboard' || route === 'owner-dashboard';
-  const isAuthPage = route === 'login' || route === 'customer-login' || route === 'owner-login' || route === 'signup';
+  const isAuthPage = route === 'customer-login' || route === 'owner-login' || route === 'signup';
   const showFooter = route !== 'order' && !isDashboard && !isAuthPage;
 
   return (
@@ -47,10 +47,9 @@ function App() {
             {route === 'order' && <OrderPage />}
             {route === 'outlets' && <OutletsPage />}
             {route === 'about' && <AboutPage />}
-            {route === 'login' && <LoginPage />}
-            {route === 'customer-login' && <AuthPage mode="customer" />}
-            {route === 'owner-login' && <AuthPage mode="owner" />}
-            {route === 'signup' && <AuthPage mode="customer" />}
+            {route === 'customer-login' && <CustomerLoginPage />}
+            {route === 'owner-login' && <OwnerLoginPage />}
+            {route === 'signup' && <CustomerLoginPage />}
             {route === 'customer-dashboard' && <CustomerDashboard />}
             {route === 'owner-dashboard' && <OwnerDashboard />}
           </main>

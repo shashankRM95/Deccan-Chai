@@ -90,6 +90,8 @@ export function Footer() {
             <button type="button" onClick={(e) => e.preventDefault()} className="hover:text-gold-300 transition-colors">Privacy</button>
             <button type="button" onClick={(e) => e.preventDefault()} className="hover:text-gold-300 transition-colors">Terms</button>
             <button type="button" onClick={(e) => e.preventDefault()} className="hover:text-gold-300 transition-colors">Franchise</button>
+            <span className="w-1 h-1 rounded-full bg-cream-200/30"></span>
+            <button type="button" onClick={() => navigate('owner-login')} className="hover:text-gold-300 transition-colors font-medium text-cream-200/80">Store Owner Login</button>
           </div>
         </div>
       </div>

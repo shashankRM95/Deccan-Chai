@@ -14,4 +14,9 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  server: {
+    watch: {
+      ignored: ['**/8e66a061-fa7f-42ea-9179-d1af9b50a39c/**'],
+    },
+  },
 });

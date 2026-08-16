@@ -37,7 +37,18 @@ export const outlets: Outlet[] = [
   { id: 'o27', name: 'Banjara Hills', city: 'Vizag', area: 'RK Beach', address: 'Beach Rd, Ramakrishna Beach, Visakhapatnam', hours: '6:00 AM – 11:00 PM', phone: '+91 90000 70001', lat: 17.7204, lng: 83.3147, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
   { id: 'o28', name: 'Banjara Hills', city: 'Warangal', area: 'Kazipet', address: 'Kazipet X Roads, Warangal', hours: '6:00 AM – 10:30 PM', phone: '+91 90000 80001', lat: 17.9773, lng: 79.5288, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
   { id: 'o29', name: 'Banjara Hills', city: 'Vijayawada', area: 'MG Road', address: 'MG Road, Vijayawada', hours: '6:00 AM – 11:00 PM', phone: '+91 90000 90001', lat: 16.5062, lng: 80.6480, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
-  { id: 'o30', name: 'Banjara Hills', city: 'Bhubaneswar', area: 'Patia', address: 'Patia, Bhubaneswar', hours: '6:30 AM – 11:00 PM', phone: '+91 90000 11001', lat: 20.2960, lng: 85.8245, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'new-1', name: 'Deccan Chai - Kadur Road', city: 'Chikkamagaluru', area: 'Near AIT Circle', address: 'Near AIT Circle, beside Udupi Hotel, Kadur Road, Chikkamagaluru 577102', hours: '6:00 AM – 11:30 PM', phone: '+91 93090 02185', lat: 13.3161, lng: 75.7720, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'new-2', name: 'Deccan Chai - Gangavathi', city: 'Koppal', area: 'Sri Ram Nagar', address: 'Sri Ram Nagar, Devi Residency, Gangavathi, Koppal District 583282', hours: '6:00 AM – 11:30 PM', phone: '—', lat: 15.4332, lng: 76.5315, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'new-3', name: 'Deccan Chai - Nandoor', city: 'Kalaburagi', area: 'Shahbad Road', address: '7V4W+72F, Shahbad Road, near Panchmukhi Hanuman Temple, Nandoor K, Karnataka 585228', hours: '6:00 AM – 11:30 PM', phone: '—', lat: 17.3297, lng: 76.8343, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'new-4', name: 'Deccan Chai - Shahbad', city: 'Kalaburagi', area: 'Bankoor Cross', address: 'Shop No. 1, Deccan Chai, Bankoor Cross, Main Road, opposite Pawar Medical, Shahbad 585228', hours: '6:00 AM – 11:30 PM', phone: '—', lat: 17.1333, lng: 76.9333, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'new-5', name: 'Deccan Chai - Shahabad 2', city: 'Kalaburagi', area: 'Shahabad', address: '4W9R+V7W, Shahabad, Karnataka 585228', hours: '6:00 AM – 11:30 PM', phone: '—', lat: 17.1330, lng: 76.9330, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'new-6', name: 'Deccan Chai - Janwada', city: 'Bidar', area: 'Janwada', address: 'Janwada, Karnataka 585402', hours: '6:00 AM – 11:30 PM', phone: '+91 91082 97517', lat: 17.9104, lng: 77.5199, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
+  { id: 'new-7', name: 'Deccan Chai - Shantinagar', city: 'Kalaburagi', area: 'Shanti Nagar', address: 'Shop No. 01, Shantinagar 4 Depot, Bus Stand Road, Shanti Nagar, Kalaburagi 585103', hours: 'Temporarily Closed', phone: '+91 93801 06818', lat: 17.3300, lng: 76.8300, amenities: ['Dine-in', 'Takeaway'], dineIn: true, takeaway: true },
 ];
 
-export const cities = Array.from(new Set(outlets.map((o) => o.city)));
+export const cities = Array.from(new Set([
+  ...outlets.map((o) => o.city),
+  'Bengaluru', 'Kolar', 'Tumakuru', 'Mysuru', 'Chikkaballapur', 'Ballari', 
+  'Hubballi', 'Dharwad', 'Belagavi', 'Mangaluru', 'Shivamogga', 'Hassan', 
+  'Raichur', 'Vijayapura', 'Bagalkot', 'Davanagere', 'Mandya'
+])).sort();

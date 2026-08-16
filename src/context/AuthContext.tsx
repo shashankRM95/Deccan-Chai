@@ -137,26 +137,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       const fbRes = await sendFirebasePhoneOtp(phoneParam);
-      if (
-        !fbRes.success &&
-        fbRes.error &&
-        !fbRes.error.toLowerCase().includes('recaptcha') &&
-        !fbRes.error.includes('auth/invalid-app-credential') &&
-        !fbRes.error.includes('auth/api-key-not-valid') &&
-        !fbRes.error.includes('auth/operation-not-allowed')
-      ) {
-        return { error: fbRes.error };
+      if (!fbRes.success) {
+        // Return the exact Firebase error to the UI so we can see what's wrong!
+        return { error: `Firebase Error: ${fbRes.error}` };
       }
 
-      try {
-        await supabase.auth.signInWithOtp({
-          phone: phoneParam,
-        });
-      } catch {
-        // fallback handling below
-      }
+      // If Firebase successfully sent the SMS, we return here (no demo code generated)
+      return { error: null, isDemo: false };
     }
 
+    // Only email goes here now for Demo fallback (if Supabase email fails)
     const generatedCode = Math.floor(10000000 + Math.random() * 90000000).toString();
     const pendingData = { code: generatedCode, expiresAt: Date.now() + 10 * 60 * 1000 };
     localStorage.setItem(`pending_otp_${targetKey}`, JSON.stringify(pendingData));
